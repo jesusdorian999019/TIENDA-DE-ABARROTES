@@ -34,18 +34,23 @@ def main():
     user_service = UserService()
     user_service.initialize_default_user()
     
-    # Crear ventana raíz
+    # Crear una única ventana raíz
     root = tk.Tk()
+    root.withdraw()  # Ocultar la ventana inicial
     
     # Mostrar ventana de login
     login = LoginWindow(root)
     username = login.show()
     
-    # Si el login fue exitoso, abrir ventana principal
+    # Si el login fue exitoso, mostrar ventana principal en la misma ventana
     if username:
-        app_root = tk.Tk()
-        app = MainWindow(app_root, username)
-        app_root.mainloop()
+        root.deiconify()  # Mostrar la ventana
+        root.geometry("1000x700+100+100")
+        root.title("Gestión de Ferretería - Principal")
+        app = MainWindow(root, username)
+        root.mainloop()
+    else:
+        root.destroy()
 
 
 if __name__ == "__main__":

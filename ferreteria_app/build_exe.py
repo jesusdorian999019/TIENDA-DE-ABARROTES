@@ -64,10 +64,11 @@ def build_executable():
         "--onefile",
         "--windowed",
         "--name=FerreteriaPOS",
-        "--console",
         f"--distpath={dist_dir}",
         f"--workpath={build_dir}",
-        "--noconfirm"
+        "--noconfirm",
+        "--hidden-import=bcrypt",
+        "--hidden-import=openpyxl"
     ]
     
     try:
