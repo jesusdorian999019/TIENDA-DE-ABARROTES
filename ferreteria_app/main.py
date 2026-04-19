@@ -30,34 +30,36 @@ from ui.main_window import MainWindow
 def main():
     """Punto de entrada de la aplicación."""
     
-    # Inicializar usuario por defecto
-    user_service = UserService()
-    user_service.initialize_default_user()
-    
-    # Crear una única ventana raíz
-    root = tk.Tk()
-    root.withdraw()  # Ocultar la ventana inicial
-    
-    # Mostrar ventana de login
-    login = LoginWindow(root)
-    username = login.show()
-    
-    # Si el login fue exitoso, mostrar ventana principal en la misma ventana
-    if username:
-        root.deiconify()  # Mostrar la ventana
-        root.geometry("1000x700+100+100")
-        root.title("Gestión de Ferretería - Principal")
-        app = MainWindow(root, username)
-        root.mainloop()
-    else:
-        root.destroy()
-
-
-if __name__ == "__main__":
     try:
-        main()
+        # Inicializar usuario por defecto
+        user_service = UserService()
+        user_service.initialize_default_user()
+        
+        # Crear ventana para login
+        login_root = tk.Tk()
+        login_root.withdraw()  # Ocultar la ventana inicial
+        
+        # Mostrar ventana de login
+        login = LoginWindow(login_root)
+        username = login.show()
+        
+        # Si el login fue exitoso, mostrar ventana principal
+        if username:
+            # Crear nueva ventana para la aplicación principal
+            main_root = tk.Tk()
+            main_root.geometry("1000x700+100+100")
+            main_root.title("Gestión de Ferretería - Principal")
+            app = MainWindow(main_root, username)
+            main_root.mainloop()
+        else:
+            # Login cancelado
+            pass
+            
     except Exception as e:
         print(f"Error al iniciar la aplicación: {e}")
         import traceback
         traceback.print_exc()
-        input("Presione Enter para salir...")
+
+
+if __name__ == "__main__":
+    main()
