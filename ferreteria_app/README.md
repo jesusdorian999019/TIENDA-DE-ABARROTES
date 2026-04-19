@@ -45,4 +45,3 @@ Archivo: `dist/FerreteriaPOS.exe`
 Usuario inicial: admin / admin123
 
 ¡Listo para usar!
-
