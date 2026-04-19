@@ -351,5 +351,5 @@ Para reportar problemas, sugerencias o consultas, contactar al equipo de desarro
 
 Versión: 1.0.0
 Última actualización: Abril 2026
-Licencia: [Especificar licencia]
-Desarrollador: [Nombre del equipo]
+Licencia: JESUSD.U
+Desarrollador: jesusdorian999019
