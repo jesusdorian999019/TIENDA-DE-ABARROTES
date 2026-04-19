@@ -60,19 +60,14 @@ def build_executable():
     
     cmd = [
         "pyinstaller",
-        "--onefile",                          # Un solo archivo ejecutable
-        "--windowed",                         # Sin ventana de consola
-        "--name=Ferreteria",                  # Nombre del ejecutable
-        "--console",                          # Mostrar errores en consola si hay
-        "--add-data=config:config",           # Incluir archivos de config
-        "--add-data=data:data",               # Incluir datos
-        "--add-data=business:business",       # Incluir business logic
-        "--add-data=ui:ui",                   # Incluir UI
-        "--add-data=utils:utils",             # Incluir utils
-        "--collect-all=openpyxl",            # Incluir dependencias de openpyxl
+        str(project_dir / "main.py"),
+        "--onefile",
+        "--windowed",
+        "--name=FerreteriaPOS",
+        "--console",
         f"--distpath={dist_dir}",
-        f"--buildpath={build_dir}",
-        str(project_dir / "main.py")
+        f"--workpath={build_dir}",
+        "--noconfirm"
     ]
     
     try:
