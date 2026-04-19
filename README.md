@@ -4,17 +4,39 @@ Sistema profesional de gestión para ferreterías desarrollado en Python. Incluy
 
 ## Descarga Rápida
 
-### Usuarios Finales
+### Para Usuarios Finales (Opción Recomendada)
 
-**Windows 10/11 - Opción Recomendada:**
+**Metodo 1: Script Automático (Lo más fácil)**
 
-1. Descargar: `ferreteria_app/dist/FerreteriaPOS.exe` (22.81 MB)
-2. Ejecutar con doble clic
-3. Ingresar credenciales: `admin / admin123`
+1. Descargar toda la carpeta del proyecto
+2. En la carpeta raíz, hacer DOBLE CLIC en: `Ejecutar.bat`
+3. La aplicación se abrirá automáticamente
+4. Ingresar: `admin / admin123`
 
-**No requiere instalación de Python ni dependencias externas.**
+El script crea automáticamente la carpeta de datos y ejecuta el programa.
 
-Requisitos: Windows 10 o superior, 512 MB RAM, 100 MB disco disponible
+**Metodo 2: Solo el ejecutable**
+
+1. Navegar a: `ferreteria_app/dist/`
+2. Hacer DOBLE CLIC en: `Ejecutar.bat` (si está disponible)
+3. O directamente en: `FerreteriaPOS.exe`
+4. Ingresar: `admin / admin123`
+
+**Método 3: Desde PowerShell o CMD**
+
+```bash
+cd ferreteria_app\dist
+FerreteriaPOS.exe
+```
+
+**Requisitos:**
+- Windows 10 o 11
+- RAM: 512 MB mínimo
+- Disco: 100 MB disponible
+- No requiere Python instalado
+- No requiere conexión a Internet
+
+**Nota:** La carpeta de almacenamiento se crea automáticamente al primer uso.
 
 ## Características Principales
 

@@ -1,8 +1,15 @@
 import os
 from pathlib import Path
 
-# Rutas base
-BASE_DIR = Path(__file__).parent.parent
+# Rutas base - Compatible con .exe compilado y código fuente
+if getattr(os, 'frozen', False):
+    # Si es ejecutable compilado con PyInstaller
+    BASE_DIR = Path(os.path.dirname(os.path.abspath(os.sys.executable))).parent
+else:
+    # Si es código fuente
+    BASE_DIR = Path(__file__).parent.parent
+
+# Crear data_storage en la ruta del ejecutable o código
 DATA_DIR = BASE_DIR / "data_storage"
 
 # Asegurar que exista el directorio de datos
