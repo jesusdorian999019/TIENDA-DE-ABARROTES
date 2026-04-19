@@ -73,7 +73,7 @@ class SalesService:
         for cb in self.data_updated_callbacks:
             try:
                 cb()
-            except:
+            except Exception:
                 pass
     
     def get_all_sales(self, limit: int = None, offset: int = 0) -> List[Sale]:

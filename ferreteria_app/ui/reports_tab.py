@@ -187,15 +187,47 @@ class ReportsTab:
         
         ttk.Label(control_frame, text="Mostrar últimos:").pack(side=tk.LEFT, padx=5)
         
-        period_var = tk.StringVar(value="7_days")
-        ttk.Radiobutton(control_frame, text="7 días", variable=period_var, value="7_days").pack(side=tk.LEFT, padx=5)
-        ttk.Radiobutton(control_frame, text="30 días", variable=period_var, value="30_days").pack(side=tk.LEFT, padx=5)
-        ttk.Radiobutton(control_frame, text="Todo", variable=period_var, value="all").pack(side=tk.LEFT, padx=5)
+        self.period_var_sales = tk.StringVar(value="7_days")
+        ttk.Radiobutton(control_frame, text="7 días", variable=self.period_var_sales, value="7_days", 
+                       command=lambda: self._update_sales_chart(main_frame)).pack(side=tk.LEFT, padx=5)
+        ttk.Radiobutton(control_frame, text="30 días", variable=self.period_var_sales, value="30_days",
+                       command=lambda: self._update_sales_chart(main_frame)).pack(side=tk.LEFT, padx=5)
+        ttk.Radiobutton(control_frame, text="Todo", variable=self.period_var_sales, value="all",
+                       command=lambda: self._update_sales_chart(main_frame)).pack(side=tk.LEFT, padx=5)
         
         # Resumen de ventas
-        summary_frame = ttk.LabelFrame(main_frame, text="Resumen de Ventas", padding=15)
-        summary_frame.pack(fill=tk.X, padx=10, pady=10)
+        self.sales_summary_frame = ttk.LabelFrame(main_frame, text="Resumen de Ventas", padding=15)
+        self.sales_summary_frame.pack(fill=tk.X, padx=10, pady=10)
         
+        # Gráfico de ventas
+        self.chart_frame = ttk.LabelFrame(main_frame, text="Ventas", padding=10)
+        self.chart_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Actualizar gráfico inicial
+        self._update_sales_chart(main_frame)
+    
+    def _update_sales_chart(self, parent):
+        """Actualiza el gráfico de ventas según el período seleccionado."""
+        # Limpiar frames previos
+        for widget in self.sales_summary_frame.winfo_children():
+            widget.destroy()
+        for widget in self.chart_frame.winfo_children():
+            widget.destroy()
+        
+        period = self.period_var_sales.get()
+        
+        # Obtener sales según período
+        if period == "7_days":
+            daily_sales = self.reports_service.get_last_7_days_sales()
+            self.chart_frame.config(text="Ventas Últimos 7 Días")
+        elif period == "30_days":
+            daily_sales = self.reports_service.get_last_30_days_sales()
+            self.chart_frame.config(text="Ventas Últimos 30 Días")
+        else:  # all
+            daily_sales = self.reports_service.get_all_sales_by_date()
+            self.chart_frame.config(text="Ventas Totales")
+        
+        # Resumen de ventas
         sales_summary = self.reports_service.get_sales_summary()
         
         info = [
@@ -205,21 +237,15 @@ class ReportsTab:
         ]
         
         for info_text in info:
-            ttk.Label(summary_frame, text=info_text, font=('Helvetica', 10)).pack(anchor=tk.W, pady=3)
+            ttk.Label(self.sales_summary_frame, text=info_text, font=('Helvetica', 10)).pack(anchor=tk.W, pady=3)
         
-        # Gráfico de últimos 7 días
-        chart_frame = ttk.LabelFrame(main_frame, text="Ventas Últimos 7 Días", padding=10)
-        chart_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        daily_sales = self.reports_service.get_last_7_days_sales()
-        
-        # Crear un gráfico simple con barras de texto
+        # Crear gráfico
         max_revenue = max(daily_sales.values()) if daily_sales.values() else 1
         
         for date, revenue in daily_sales.items():
             bar_length = int((revenue / max_revenue) * 40) if max_revenue > 0 else 0
             bar = "█" * bar_length
-            ttk.Label(chart_frame, text=f"{date}: {bar} ${revenue:.2f}", font=('Courier', 9)).pack(anchor=tk.W, pady=2)
+            ttk.Label(self.chart_frame, text=f"{date}: {bar} ${revenue:.2f}", font=('Courier', 9)).pack(anchor=tk.W, pady=2)
     
     def _create_products_report(self, parent):
         """Crea reporte de productos más vendidos."""

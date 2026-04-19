@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-\"\"\"Script para compilar la aplicación a un ejecutable .exe usando PyInstaller.\"\"\"
+"""Script para compilar la aplicación a un ejecutable .exe usando PyInstaller."""
 
 import os
 import sys
@@ -10,7 +10,7 @@ import subprocess
 
 
 def build_executable():
-    \"\"\"Construye el archivo ejecutable.\"\"\"
+    """Construye el archivo ejecutable."""
 
     print('=' * 60)
     print('COMPILACION - Gestion de Ferreteria')
@@ -64,7 +64,7 @@ def build_executable():
         '--noconfirm',
         '--hidden-import=bcrypt',
         '--hidden-import=openpyxl',
-        f'--add-data={project_dir / \"data_storage\"}{os.pathsep}data_storage'
+        f'--add-data={project_dir / "data_storage"}{os.pathsep}data_storage'
     ]
 
     try:

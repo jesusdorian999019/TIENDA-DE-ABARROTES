@@ -155,10 +155,6 @@ class MainWindow:
         self.inventory_tab.refresh()
         self.sales_tab.refresh()
         self.reports_tab.refresh()
-
-    def _refresh(self):
-        """Manual refresh button."""
-        self._refresh_all_tabs()
     
     def _check_alerts(self):
         """Verifica alertas de stock bajo."""

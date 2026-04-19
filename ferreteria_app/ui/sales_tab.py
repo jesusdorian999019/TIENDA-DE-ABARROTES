@@ -12,6 +12,7 @@ class SalesTab:
         self.sales_service = sales_service
         self.inventory_service = inventory_service
         self.selected_sale = None
+        self.current_product = None
         
         self._create_ui()
         self.refresh()

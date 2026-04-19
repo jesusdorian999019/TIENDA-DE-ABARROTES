@@ -131,7 +131,7 @@ class InventoryService:
         for cb in self.data_updated_callbacks:
             try:
                 cb()
-            except:
+            except Exception:
                 pass
     
     def get_all_products(self, limit: int = None, offset: int = 0) -> List[Product]:
