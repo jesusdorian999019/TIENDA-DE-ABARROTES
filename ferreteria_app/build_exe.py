@@ -79,7 +79,7 @@ def build_executable():
         return False
     
     # Verificar que se creó el ejecutable
-    exe_path = dist_dir / "Ferreteria.exe"
+    exe_path = dist_dir / "FerreteriaPOS.exe"
     if not exe_path.exists():
         print("\n❌ Error: El archivo ejecutable no se creó")
         return False
