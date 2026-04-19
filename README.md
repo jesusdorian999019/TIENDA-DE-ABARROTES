@@ -1,65 +1,48 @@
-# Gestión de Ferretería
+# Gestión de Ferretería POS
 
-Aplicación de escritorio para gestión de inventario y ventas de ferretería.
+[![GitHub](https://img.shields.io/badge/GitHub-DESCARGAR-F64B47)](https://github.com/jesusdorian999019/TIENDA-DE-ABARROTES)
 
-## Instrucciones de Uso
+## 🚀 Para Clientes - 3 Clics
 
-### Opción 1: Archivo Ejecutable (Recomendado)
-1. Descargar Ferreteria.exe desde la sección Releases del repositorio
-2. Hacer doble clic para ejecutar
-3. Usuario inicial: admin / admin123
+### Método 1: Ejecutable (.exe)
+1. [Releases](https://github.com/jesusdorian999019/TIENDA-DE-ABARROTES/releases) → Descargar **FerreteriaPOS.exe**
+2. Doble clic
+3. `admin` / `admin123`
 
-No requiere instalación de Python.
+### Método 2: ZIP Rápido
+1. [Ver Repositorio](https://github.com/jesusdorian999019/TIENDA-DE-ABARROTES)
+2. **Code** → **Download ZIP**
+3. Extraer → `ferreteria_app` → `FerreteriaPOS.exe` → Doble clic
 
-### Opción 2: Para Desarrolladores
+**¡Sin instalar nada!**
+
+## 👨‍💻 Desarrollador
 ```bash
+git clone https://github.com/jesusdorian999019/TIENDA-DE-ABARROTES.git
+cd ferreteria_app
 pip install -r requirements.txt
 python main.py
 ```
 
-## Funcionalidades
-- Gestión completa de inventario (crear, editar, eliminar productos)
-- Registro de ventas con actualización automática de stock
-- Reportes y dashboard con gráficos
-- Exportación de datos a Excel
-- Búsqueda y filtrado de productos
-- Alertas de stock bajo
+## ✨ Características
+- ✅ Inventario completo
+- ✅ Ventas + Stock automático
+- ✅ Reportes + Excel
+- ✅ Búsqueda instantánea
+- ✅ Profesional Tkinter
 
-## Estructura de Archivos
-```
-ferreteria_app/
-├── main.py               - Punto de entrada
-├── requirements.txt      - Dependencias
-├── business/             - Lógica de negocio
-├── ui/                   - Interfaz gráfica
-├── data/                 - Gestión de datos JSON
-├── config/               - Configuración
-├── utils/                - Utilidades
-└── data_storage/         - Archivos de datos (users.json, products.json, sales.json)
-```
-
-## Generar Ejecutable .exe
+## 📦 Generar .exe
 ```bash
-pip install pyinstaller
+cd ferreteria_app
 python build_exe.py
 ```
-Archivo generado: dist/Ferreteria.exe
 
-## Datos de Prueba
-```bash
-python load_demo_data.py
-```
-Luego reiniciar la aplicación.
+**Archivo:** `dist/FerreteriaPOS.exe`
 
-## Soporte Técnico
-Datos guardados en data_storage/
-- users.json - Usuarios
-- products.json - Productos
-- sales.json - Ventas
+## 📚 Documentación
+- [INICIO_RAPIDO.md](ferreteria_app/INICIO_RAPIDO.md) ← ⭐ Comenzar aquí
+- [ARQUITECTURA.md](ferreteria_app/ARQUITECTURA.md)
+- [JSON_FORMAT_SPEC.md](ferreteria_app/JSON_FORMAT_SPEC.md)
 
-Usuario administrador: admin / admin123
+**¡Listo para negocio real!**
 
-## Documentación Adicional
-- ARQUITECTURA.md - Diseño del sistema
-- INICIO_RAPIDO.md - Guía de inicio
-- INSTALL_INSTRUCTIONS.txt - Instalación detallada
