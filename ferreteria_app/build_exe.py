@@ -95,7 +95,8 @@ def build_executable():
         f"--workpath={build_dir}",
         "--noconfirm",
         "--hidden-import=bcrypt",
-        "--hidden-import=openpyxl"
+        "--hidden-import=openpyxl",
+        f"--add-data={project_dir / 'data_storage'}{os.pathsep}data_storage"
     ]
     
     try:
