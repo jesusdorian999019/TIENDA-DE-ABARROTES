@@ -23,7 +23,7 @@ class SalesService:
     def register_sale(self, product_id: str, product_name: str, quantity: int,
                      unit_price: float) -> Tuple[bool, str]:
         """
-        Registra una venta.
+        Registra una venta con validación de stock.
         
         Returns:
             Tupla (éxito, mensaje)
@@ -36,6 +36,19 @@ class SalesService:
         valid, msg = self.validators.validate_price(str(unit_price))
         if not valid:
             return False, msg
+        
+        # Validar que existe el servicio de inventario
+        if not self.inventory_service:
+            return False, "Servicio de inventario no disponible"
+        
+        # Validar que el producto existe
+        product = self.inventory_service.get_product(product_id)
+        if not product:
+            return False, "Producto no encontrado"
+        
+        # Validar que hay suficiente stock
+        if product.stock < quantity:
+            return False, f"Stock insuficiente. Disponible: {product.stock}, Solicitado: {quantity}"
         
         # Calcular total
         total = quantity * unit_price
@@ -59,11 +72,11 @@ class SalesService:
         
         # Guardar venta
         if self.data_manager.create_sale(sale):
-            # Actualizar stock si hay inventory service
+            # Actualizar stock solo si la venta se registró correctamente
             if self.inventory_service:
                 self.inventory_service.update_stock(product_id, quantity)
             
-            self._notify_callbacks()  # NEW: Notify UI
+            self._notify_callbacks()
             return True, f"Venta registrada: ${total:.2f}"
         else:
             return False, "Error al registrar venta"
@@ -73,7 +86,7 @@ class SalesService:
         for cb in self.data_updated_callbacks:
             try:
                 cb()
-            except:
+            except Exception:
                 pass
     
     def get_all_sales(self, limit: int = None, offset: int = 0) -> List[Sale]:

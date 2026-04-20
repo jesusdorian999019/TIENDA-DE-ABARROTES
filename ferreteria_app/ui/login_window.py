@@ -14,8 +14,27 @@ class LoginWindow:
         """Inicializa la ventana de login."""
         self.root = root
         self.root.title(f"{APP_TITLE} - Login")
-        self.root.geometry("400x300+400+200")
+        
+        # Configurar tamaño
+        window_width = 400
+        window_height = 300
+        
+        # Obtener dimensiones de la pantalla
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        
+        # Calcular posición central
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        
+        # Configurar geometría (centrada)
+        self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
         self.root.resizable(False, False)
+        
+        # Hacer la ventana siempre visible
+        self.root.deiconify()  # Asegurar que se muestre
+        self.root.lift()       # Traer al frente
+        self.root.focus()      # Dar foco
         
         self.user_service = UserService()
         self.current_user = None
@@ -70,6 +89,15 @@ class LoginWindow:
             foreground="gray"
         )
         note.pack(pady=10)
+
+        # Creditos
+        credits = ttk.Label(
+            main_frame,
+            text="jesusdorian999019 - JESUS.U",
+            font=("Helvetica", 8),
+            foreground="#888888"
+        )
+        credits.pack(pady=(5, 0))
     
     def _login(self):
         """Intenta hacer login."""

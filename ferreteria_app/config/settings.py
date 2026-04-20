@@ -1,18 +1,17 @@
 import os
+import sys
 from pathlib import Path
 
-# Rutas base - Compatible con .exe compilado y código fuente
-if getattr(os, 'frozen', False):
-    # Si es ejecutable compilado con PyInstaller
-    BASE_DIR = Path(os.path.dirname(os.path.abspath(os.sys.executable))).parent
+# Determinar la carpeta base
+if getattr(sys, 'frozen', False):
+    # Es ejecutable compilado - usar la carpeta del .exe real
+    BASE_DIR = Path(sys.executable).parent
 else:
-    # Si es código fuente
+    # Es código fuente - usar la carpeta del proyecto
     BASE_DIR = Path(__file__).parent.parent
 
-# Crear data_storage en la ruta del ejecutable o código
+# Crear data_storage en la misma carpeta
 DATA_DIR = BASE_DIR / "data_storage"
-
-# Asegurar que exista el directorio de datos
 DATA_DIR.mkdir(exist_ok=True)
 
 # Rutas de archivos JSON
@@ -23,33 +22,37 @@ SALES_FILE = DATA_DIR / "sales.json"
 # Configuración de la aplicación
 APP_TITLE = "Gestión de Ferretería"
 APP_VERSION = "1.0.0"
-WINDOW_WIDTH = 1000
-WINDOW_HEIGHT = 700
-WINDOW_GEOMETRY = f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+100+100"
 
-# Configuración de colores
-PRIMARY_COLOR = "#2c3e50"
-SECONDARY_COLOR = "#3498db"
+# Configuración de ventana
+WINDOW_GEOMETRY = "1000x700+100+100"
+WINDOW_WIDTH = 400
+WINDOW_HEIGHT = 300
+
+# Colores
+PRIMARY_COLOR = "#1e3a5f"
+SECONDARY_COLOR = "#2c3e50"
+LIGHT_BG = "#f5f5f5"
+TEXT_COLOR = "#333333"
 SUCCESS_COLOR = "#27ae60"
 WARNING_COLOR = "#e74c3c"
-LIGHT_BG = "#ecf0f1"
-TEXT_COLOR = "#2c3e50"
 
-# Configuración de usuario de demostración
+# Configuración de seguridad
+PASSWORD_ROUNDS = 12
+
+# Usuario y contraseña por defecto
 DEFAULT_ADMIN_USERNAME = "admin"
-DEFAULT_ADMIN_PASSWORD = "admin123"  # Se hasheará al crear
+DEFAULT_ADMIN_PASSWORD = "admin123"
 
-# Categorías predeterminadas
+# Categorías de productos
 PRODUCT_CATEGORIES = [
     "Herramientas",
+    "Pinturas",
+    "Fijaciones",
     "Electricidad",
-    "Plomería",
-    "Construcción",
-    "Pintura",
-    "Tornillos y Tuercas",
-    "Otro"
+    "Fontanería",
+    "Madera",
+    "Metal",
+    "Jardinería",
+    "Automotriz",
+    "Otros"
 ]
-
-# Configuración de exportación
-EXCEL_DATE_FORMAT = "dd/mm/yyyy"
-EXCEL_NUMBER_FORMAT = "0.00"

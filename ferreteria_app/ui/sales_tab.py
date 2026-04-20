@@ -12,6 +12,7 @@ class SalesTab:
         self.sales_service = sales_service
         self.inventory_service = inventory_service
         self.selected_sale = None
+        self.current_product = None
         
         self._create_ui()
         self.refresh()
@@ -29,6 +30,9 @@ class SalesTab:
         self.product_combo.grid(row=0, column=1, padx=5, pady=5)
         self.product_combo.bind('<<ComboboxSelected>>', self._on_product_selected)
         self._update_product_list()
+        
+        # Boton de actualizar productos
+        ttk.Button(register_frame, text="Buscar Nuevos", command=self._refresh_products).grid(row=0, column=2, padx=5, pady=5)
         
         # Cantidad
         ttk.Label(register_frame, text="Cantidad:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
@@ -114,6 +118,11 @@ class SalesTab:
         products = self.inventory_service.get_all_products()
         product_list = [f"{p.name} ({p.code})" for p in products if p.stock > 0]
         self.product_combo['values'] = product_list
+    
+    def _refresh_products(self):
+        """Actualiza la lista de productos desde el inventario."""
+        self._update_product_list()
+        messagebox.showinfo("Actualizar", "Lista de productos actualizada")
     
     def _on_product_selected(self, event=None):
         """Evento cuando se selecciona un producto."""

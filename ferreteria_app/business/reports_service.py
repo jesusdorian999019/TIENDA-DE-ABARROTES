@@ -155,3 +155,36 @@ class ReportsService:
             'low_stock_count': low_stock,
             'top_products': self.data_manager.get_top_sold_products(5)
         }
+    
+    def get_last_30_days_sales(self) -> Dict[str, float]:
+        """Obtiene ventas de los últimos 30 días."""
+        sales = self.data_manager.get_all_sales()
+        
+        daily_sales = {}
+        today = datetime.now()
+        
+        for i in range(30):
+            date = (today - timedelta(days=i)).strftime('%Y-%m-%d')
+            daily_sales[date] = 0
+        
+        for sale in sales:
+            if sale.date in daily_sales:
+                daily_sales[sale.date] += sale.total
+        
+        return dict(sorted(daily_sales.items()))
+    
+    def get_all_sales_by_date(self) -> Dict[str, float]:
+        """Obtiene ventas agrupadas por fecha (todas las ventas)."""
+        sales = self.data_manager.get_all_sales()
+        
+        daily_sales = {}
+        for sale in sales:
+            if sale.date not in daily_sales:
+                daily_sales[sale.date] = 0
+            daily_sales[sale.date] += sale.total
+        
+        return dict(sorted(daily_sales.items()))
+    
+    def reset_all_sales(self) -> bool:
+        """Elimina todos los registros de ventas. Requiere autenticación."""
+        return self.data_manager.clear_all_sales()
