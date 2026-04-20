@@ -184,3 +184,7 @@ class ReportsService:
             daily_sales[sale.date] += sale.total
         
         return dict(sorted(daily_sales.items()))
+    
+    def reset_all_sales(self) -> bool:
+        """Elimina todos los registros de ventas. Requiere autenticación."""
+        return self.data_manager.clear_all_sales()

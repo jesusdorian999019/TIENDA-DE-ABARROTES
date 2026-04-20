@@ -52,9 +52,21 @@ class InventoryService:
         if not valid:
             return False, msg
         
+        # Validar que el precio de venta sea mayor al precio de compra
+        if float(sale_price) <= float(purchase_price):
+            return False, "El precio de venta debe ser mayor al precio de compra (requiere ganancia)"
+        
         valid, msg = self.validators.validate_quantity(str(stock))
         if not valid:
             return False, msg
+        
+        valid, msg = self.validators.validate_min_stock(str(min_stock))
+        if not valid:
+            return False, msg
+        
+        # Validar que el stock inicial sea mayor o igual al stock mínimo
+        if int(stock) < int(min_stock):
+            return False, f"Stock inicial ({stock}) no puede ser menor al stock mínimo ({min_stock})"
         
         valid, msg = self.validators.validate_min_stock(str(min_stock))
         if not valid:

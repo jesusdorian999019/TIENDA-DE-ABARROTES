@@ -49,7 +49,7 @@ def main():
             main_root = tk.Tk()
             main_root.geometry("1000x700+100+100")
             main_root.title("Gestión de Ferretería - Principal")
-            app = MainWindow(main_root, username)
+            app = MainWindow(main_root, username, user_service)
             main_root.mainloop()
         else:
             # Login cancelado

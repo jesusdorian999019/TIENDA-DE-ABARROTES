@@ -270,3 +270,7 @@ class JsonManager(DataManager):
         )
         
         return sorted_products[:limit]
+    
+    def clear_all_sales(self) -> bool:
+        """Elimina todos los registros de ventas."""
+        return self._write_file(SALES_FILE, [])

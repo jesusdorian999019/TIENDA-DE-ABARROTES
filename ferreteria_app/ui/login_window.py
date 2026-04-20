@@ -89,6 +89,15 @@ class LoginWindow:
             foreground="gray"
         )
         note.pack(pady=10)
+
+        # Creditos
+        credits = ttk.Label(
+            main_frame,
+            text="jesusdorian999019 - JESUS.U",
+            font=("Helvetica", 8),
+            foreground="#888888"
+        )
+        credits.pack(pady=(5, 0))
     
     def _login(self):
         """Intenta hacer login."""
