@@ -4,7 +4,10 @@
       "Bash(python -c \"from ui.reports_tab import ReportsTab; from business.reports_service import ReportsService; print\\(''Import OK''\\)\")",
       "Bash(python build_exe.py)",
       "Bash(python -c \"import main\")",
-      "Bash(pyinstaller --onefile --windowed --clean --add-data \"config;config\" --add-data \"data;data\" --add-data \"ui;ui\" --add-data \"business;business\" --add-data \"utils;utils\" --hidden-import=tkinter --hidden-import=tkinter.ttk --hidden-import=bcrypt --hidden-import=openpyxl main.py --name FerreteriaPOS)"
+      "Bash(pyinstaller --onefile --windowed --clean --add-data \"config;config\" --add-data \"data;data\" --add-data \"ui;ui\" --add-data \"business;business\" --add-data \"utils;utils\" --hidden-import=tkinter --hidden-import=tkinter.ttk --hidden-import=bcrypt --hidden-import=openpyxl main.py --name FerreteriaPOS)",
+      "Bash(del \"d:\\\\codigo 01\\\\TIENDA-DE-ABARROTES\\\\FerreteriaPOS.exe\")",
+      "Bash(python -m py_compile \"d:/codigo 01/TIENDA-DE-ABARROTES/ferreteria_app/ui/main_window.py\")",
+      "Bash(python main.py)"
     ]
   }
 }

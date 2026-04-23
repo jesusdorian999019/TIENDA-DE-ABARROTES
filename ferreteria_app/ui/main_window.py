@@ -67,12 +67,15 @@ class MainWindow:
 
     def _create_ui(self):
         """Crea la interfaz principal."""
-        # Frame superior con logo/título
+        # Frame superior con logo/título Y botón exportar
         header = ttk.Frame(self.root)
         header.pack(fill=tk.X, padx=10, pady=10)
 
         title = ttk.Label(header, text=APP_TITLE, style='Header.TLabel')
         title.pack(side=tk.LEFT)
+
+        export_btn = ttk.Button(header, text="Exportar a Excel", command=self._export_to_excel)
+        export_btn.pack(side=tk.LEFT, padx=20)
 
         user_label = ttk.Label(header, text=f"Usuario: {self.username}", font=('Helvetica', 9))
         user_label.pack(side=tk.RIGHT)
@@ -105,9 +108,6 @@ class MainWindow:
         # Frame inferior con botones de acción
         footer = ttk.Frame(self.root)
         footer.pack(fill=tk.X, padx=10, pady=10)
-
-        export_btn = ttk.Button(footer, text="Exportar a Excel", command=self._export_to_excel)
-        export_btn.pack(side=tk.LEFT, padx=5)
 
         refresh_btn = ttk.Button(footer, text="Actualizar", command=self._refresh_all_tabs)
         refresh_btn.pack(side=tk.LEFT, padx=5)
