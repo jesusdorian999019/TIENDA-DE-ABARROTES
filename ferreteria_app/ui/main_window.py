@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from config.settings import (
-    APP_TITLE, WINDOW_GEOMETRY, PRIMARY_COLOR, SECONDARY_COLOR,
+    APP_TITLE, APP_VERSION, WINDOW_GEOMETRY, PRIMARY_COLOR, SECONDARY_COLOR,
     LIGHT_BG, TEXT_COLOR, SUCCESS_COLOR, WARNING_COLOR
 )
 from business.inventory_service import InventoryService
@@ -10,6 +10,7 @@ from business.reports_service import ReportsService
 from business.user_service import UserService
 from data.json_manager import JsonManager
 from utils.excel_exporter import ExcelExporter
+from utils.update_checker import UpdateChecker
 from ui.inventory_tab import InventoryTab
 from ui.sales_tab import SalesTab
 from ui.reports_tab import ReportsTab
@@ -71,11 +72,25 @@ class MainWindow:
         header = ttk.Frame(self.root)
         header.pack(fill=tk.X, padx=10, pady=10)
 
-        title = ttk.Label(header, text=APP_TITLE, style='Header.TLabel')
+        # Título
+        title_frame = ttk.Frame(header)
+        title_frame.pack(side=tk.LEFT)
+
+        title = ttk.Label(title_frame, text=APP_TITLE, style='Header.TLabel')
         title.pack(side=tk.LEFT)
 
-        export_btn = ttk.Button(header, text="Exportar a Excel", command=self._export_to_excel)
-        export_btn.pack(side=tk.LEFT, padx=20)
+        version_label = ttk.Label(title_frame, text=f" v{APP_VERSION}", font=('Helvetica', 8))
+        version_label.pack(side=tk.LEFT)
+
+        # Botones de acción
+        action_frame = ttk.Frame(header)
+        action_frame.pack(side=tk.LEFT, padx=20)
+
+        export_btn = ttk.Button(action_frame, text="Exportar a Excel", command=self._export_to_excel)
+        export_btn.pack(side=tk.LEFT, padx=5)
+
+        update_btn = ttk.Button(action_frame, text="Buscar Actualizaciones", command=self._check_updates)
+        update_btn.pack(side=tk.LEFT, padx=5)
 
         user_label = ttk.Label(header, text=f"Usuario: {self.username}", font=('Helvetica', 9))
         user_label.pack(side=tk.RIGHT)
@@ -159,6 +174,30 @@ class MainWindow:
                 messagebox.showerror("Error", "No se pudo exportar el archivo")
         except Exception as e:
             messagebox.showerror("Error", f"Error al exportar: {str(e)}")
+
+    def _check_updates(self):
+        """Verifica y aplica actualizaciones."""
+        try:
+            checker = UpdateChecker()
+            result = checker.check_for_updates()
+
+            if result['available']:
+                # Hay actualización disponible
+                msg = f"Nueva versión: {result['latest_version']}\nVersión actual: {result['current_version']}\n\n¿Descargar actualización?"
+                if messagebox.askyesno("Actualización Disponible", msg):
+                    # Descargar actualización
+                    download_result = checker.download_update()
+                    messagebox.showinfo("Actualización", download_result['message'])
+            else:
+                # No hay actualización
+                if result['latest_version']:
+                    msg = f"Ya tienes la última versión ({result['current_version']})"
+                else:
+                    msg = result['message']
+                messagebox.showinfo("Actualizaciones", msg)
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al buscar actualizaciones: {str(e)}")
 
     def _refresh_all_tabs(self):
         """Auto-refresh all tabs when data changes."""
