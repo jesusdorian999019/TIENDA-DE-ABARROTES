@@ -24,7 +24,7 @@ APP_TITLE = "Gestión de Ferretería"
 APP_VERSION = "1.0.0"
 
 # GitHub update settings - CONFIGURAR ESTO PARA ACTUALIZACIONES
-GITHUB_OWNER = "jesusdorian999019"  # Cambiar por tu usuario de GitHub
+GITHUB_OWNER = "jesusdorian999019"  # Usuario de GitHub
 GITHUB_REPO = "TIENDA-DE-ABARROTES"  # Nombre del repo
 GITHUB_BRANCH = "main"
 
