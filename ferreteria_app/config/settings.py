@@ -21,7 +21,7 @@ SALES_FILE = DATA_DIR / "sales.json"
 
 # Configuración de la aplicación
 APP_TITLE = "Gestión de Ferretería"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 
 # GitHub update settings - CONFIGURAR ESTO PARA ACTUALIZACIONES
 GITHUB_OWNER = "jesusdorian999019"  # Usuario de GitHub
