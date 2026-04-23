@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
+import webbrowser
 from config.settings import (
     APP_TITLE, APP_VERSION, WINDOW_GEOMETRY, PRIMARY_COLOR, SECONDARY_COLOR,
     LIGHT_BG, TEXT_COLOR, SUCCESS_COLOR, WARNING_COLOR
@@ -92,6 +93,9 @@ class MainWindow:
         update_btn = ttk.Button(action_frame, text="Buscar Actualizaciones", command=self._check_updates)
         update_btn.pack(side=tk.LEFT, padx=5)
 
+        exit_btn = ttk.Button(action_frame, text="Salir", command=self._exit)
+        exit_btn.pack(side=tk.LEFT, padx=5)
+
         user_label = ttk.Label(header, text=f"Usuario: {self.username}", font=('Helvetica', 9))
         user_label.pack(side=tk.RIGHT)
 
@@ -120,15 +124,9 @@ class MainWindow:
         self.reports_tab = ReportsTab(self.notebook, self.reports_service, self.user_service)
         self.notebook.add(self.reports_tab.frame, text="Reportes")
 
-        # Frame inferior con botones de acción
+        # Footer - vacío por ahora
         footer = ttk.Frame(self.root)
         footer.pack(fill=tk.X, padx=10, pady=10)
-
-        refresh_btn = ttk.Button(footer, text="Actualizar", command=self._refresh_all_tabs)
-        refresh_btn.pack(side=tk.LEFT, padx=5)
-
-        exit_btn = ttk.Button(footer, text="Salir", command=self._exit)
-        exit_btn.pack(side=tk.RIGHT, padx=5)
 
     def _export_to_excel(self):
         """Exporta datos a Excel."""
@@ -176,18 +174,19 @@ class MainWindow:
             messagebox.showerror("Error", f"Error al exportar: {str(e)}")
 
     def _check_updates(self):
-        """Verifica y aplica actualizaciones."""
+        """Verifica actualizaciones y redirige al repo si hay."""
         try:
             checker = UpdateChecker()
             result = checker.check_for_updates()
 
             if result['available']:
                 # Hay actualización disponible
-                msg = f"Nueva versión: {result['latest_version']}\nVersión actual: {result['current_version']}\n\n¿Descargar actualización?"
+                msg = f"Nueva versión disponible: {result['latest_version']}\nVersión actual: {result['current_version']}\n\n¿Te gustaría descargar la nueva versión?"
                 if messagebox.askyesno("Actualización Disponible", msg):
-                    # Descargar actualización
-                    download_result = checker.download_update()
-                    messagebox.showinfo("Actualización", download_result['message'])
+                    # Abrir navegador en el repo
+                    repo_url = f"https://github.com/{checker.owner}/{checker.repo}"
+                    webbrowser.open(repo_url)
+                    messagebox.showinfo("Descargar", "Ve a Releases y descarga el nuevo .exe")
             else:
                 # No hay actualización
                 if result['latest_version']:
