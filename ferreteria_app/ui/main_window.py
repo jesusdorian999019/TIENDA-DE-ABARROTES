@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
+from datetime import datetime
 import webbrowser
 from config.settings import (
     APP_TITLE, APP_VERSION, WINDOW_GEOMETRY, PRIMARY_COLOR, SECONDARY_COLOR,
@@ -45,9 +46,9 @@ class MainWindow:
 
         # NEW: Register callbacks for auto-refresh
         self.refresh_callback = self._refresh_all_tabs
-        self.inventory_service.register_data_updated_callback(self.refresh_callback)
-        self.sales_service.register_data_updated_callback(self.refresh_callback)
-        self.reports_service.register_data_updated_callback(self.refresh_callback)
+        self.inventory_service.register_data_updated_callback(self._schedule_refresh)
+        self.sales_service.register_data_updated_callback(self._schedule_refresh)
+        self.reports_service.register_data_updated_callback(self._schedule_refresh)
 
         # Crear UI
         self._create_ui()
@@ -69,6 +70,29 @@ class MainWindow:
 
     def _create_ui(self):
         """Crea la interfaz principal."""
+        # ==================== PANEL DE RESUMEN RÁPIDO ====================
+        summary_frame = ttk.LabelFrame(self.root, text="📊 RESUMEN DEL DÍA", padding=10)
+        summary_frame.pack(fill=tk.X, padx=10, pady=5)
+
+        # Labels del resumen
+        self.summary_labels = {}
+        summary_items = [
+            ('ventas_hoy', 'Ventas Hoy:', '$0.00'),
+            ('capital_hoy', 'Capital Recup.:', '$0.00'),
+            ('ganancia_hoy', 'Ganancia Hoy:', '$0.00'),
+            ('stock_total', 'Stock Total:', '0'),
+            ('invertido', 'Capital Invert.:', '$0.00'),
+            ('valor_inv', 'Valor Invent.:', '$0.00'),
+        ]
+
+        for i, (key, label, value) in enumerate(summary_items):
+            ttk.Label(summary_frame, text=label, font=('Helvetica', 10, 'bold')).grid(row=0, column=i*2, padx=5, sticky=tk.W)
+            self.summary_labels[key] = ttk.Label(summary_frame, text=value, font=('Helvetica', 10, 'bold'), foreground=PRIMARY_COLOR)
+            self.summary_labels[key].grid(row=0, column=i*2+1, padx=5, sticky=tk.W)
+
+        # Actualizar resumen
+        self._update_summary()
+
         # Frame superior con logo/título Y botón exportar
         header = ttk.Frame(self.root)
         header.pack(fill=tk.X, padx=10, pady=10)
@@ -142,10 +166,13 @@ class MainWindow:
                     'category': p.category,
                     'code': p.code,
                     'provider': p.provider,
+                    'marca': getattr(p, 'marca', ''),  # NUEVO
+                    'unidad': getattr(p, 'unidad', 'UNIDAD'),  # NUEVO
                     'purchase_price': p.purchase_price,
                     'sale_price': p.sale_price,
                     'stock': p.stock,
-                    'min_stock': p.min_stock
+                    'min_stock': p.min_stock,
+                    'flexible_stock': getattr(p, 'flexible_stock', False),  # NUEVO
                 }
                 for p in products
             ]
@@ -156,6 +183,7 @@ class MainWindow:
                     'product_name': s.product_name,
                     'quantity': s.quantity,
                     'unit_price': s.unit_price,
+                    'purchase_price': s.purchase_price,  # NUEVO: para calcular ganancias
                     'total': s.total,
                     'date': s.date,
                     'time': s.time
@@ -203,6 +231,41 @@ class MainWindow:
         self.inventory_tab.refresh()
         self.sales_tab.refresh()
         self.reports_tab.refresh()
+        self._update_summary()  # Actualizar resumen también
+
+    def _schedule_refresh(self):
+        """Schedule refresh in the Tkinter event loop (thread-safe)."""
+        self.root.after(50, self._refresh_all_tabs)
+
+    def _update_summary(self):
+        """Actualiza el panel de resumen."""
+        try:
+            products = self.data_manager.get_all_products()
+            all_sales = self.data_manager.get_all_sales()
+
+            # Ventas de HOY
+            today = datetime.now().strftime('%Y-%m-%d')
+            today_sales = [s for s in all_sales if s.date == today]
+
+            ventas_hoy = sum(s.total for s in today_sales)
+            capital_hoy = sum(s.quantity * s.purchase_price for s in today_sales)
+            ganancia_hoy = ventas_hoy - capital_hoy
+
+            # Inventario
+            stock_total = sum(p.stock for p in products)
+            invertido = sum(p.purchase_price * p.stock for p in products)
+            valor_inv = sum(p.sale_price * p.stock for p in products)
+
+            # Actualizar labels
+            self.summary_labels['ventas_hoy'].config(text=f"${ventas_hoy:,.2f}")
+            self.summary_labels['capital_hoy'].config(text=f"${capital_hoy:,.2f}")
+            self.summary_labels['ganancia_hoy'].config(text=f"${ganancia_hoy:,.2f}", foreground='green' if ganancia_hoy >= 0 else 'red')
+            self.summary_labels['stock_total'].config(text=f"{stock_total:,.0f}")
+            self.summary_labels['invertido'].config(text=f"${invertido:,.2f}")
+            self.summary_labels['valor_inv'].config(text=f"${valor_inv:,.2f}")
+
+        except Exception as e:
+            print(f"Error actualizando resumen: {e}")
 
     def _check_alerts(self):
         """Verifica alertas de stock bajo."""

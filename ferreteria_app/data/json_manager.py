@@ -154,14 +154,16 @@ class JsonManager(DataManager):
         products = [p for p in products if p.get('id') != product_id]
         return self._write_file(PRODUCTS_FILE, products)
     
-    def update_product_stock(self, product_id: str, quantity: int) -> bool:
-        """Actualiza el stock de un producto (decrementa)."""
+    def update_product_stock(self, product_id: str, quantity: float) -> bool:
+        """Actualiza el stock de un producto (decrementa, permite decimales)."""
         products = self._read_file(PRODUCTS_FILE)
         for i, product_data in enumerate(products):
             if product_data.get('id') == product_id:
-                product_data['stock'] = max(0, product_data.get('stock', 0) - quantity)
-                product_data['updated_at'] = datetime.now().isoformat()
-                products[i] = product_data
+                # Permite decimales (stock float)
+                current_stock = float(product_data.get('stock', 0))
+                new_stock = max(0.0, current_stock - float(quantity))
+                products[i]['stock'] = new_stock
+                products[i]['updated_at'] = datetime.now().isoformat()
                 return self._write_file(PRODUCTS_FILE, products)
         return False
     

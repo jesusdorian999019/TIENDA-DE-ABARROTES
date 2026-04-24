@@ -29,8 +29,14 @@ class Product:
     provider: str
     purchase_price: float
     sale_price: float
-    stock: int
-    min_stock: int
+    stock: float  # Cambiado a float para permitir ventas por kilo
+    min_stock: float  # Cambiado a float para permitir decimales
+    # Nuevos campos para ferretería grande (v1.0.2)
+    marca: str = ""  # Marca del producto
+    unidad: str = "UNIDAD"  # UNIDAD, KILO, METRO, LITRO, etc.
+    flexible_stock: bool = False  # True = permite decimales (por kilo)
+    equivalente_sunat: str = ""  # Código SUNAT para Perú
+    tipo_igv: str = ""  # Gravado, Exonerado, Inafecto
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now().isoformat())
     
@@ -48,11 +54,14 @@ class Sale:
     id: str
     product_id: str
     product_name: str
-    quantity: int
-    unit_price: float
+    quantity: float  # Cambiado a float para permitir ventas por kilo
+    unit_price: float  # Precio de venta unitario
     total: float
-    date: str
-    time: str
+    # Nuevos campos para control de ganancias (v1.0.2)
+    purchase_price: float = 0.0  # Precio de compra al momento de la venta
+    unidad: str = "UNIDAD"  # UNIDAD, KILO, etc.
+    date: str = ""
+    time: str = ""
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     
     def to_dict(self):

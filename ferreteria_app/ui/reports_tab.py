@@ -17,6 +17,9 @@ class ReportsTab:
         self._dashboard_labels = []  # Labels del dashboard para actualizar
         self._inventory_labels = []  # Labels del inventario para actualizar
         self._sales_chart_main_frame = None
+        self._last_update_time = None  # NEW: Tiempo de última actualización
+        self._update_indicator = None  # NEW: Indicador visual de tiempo real
+        self._auto_refresh_label = None  # NEW: Label de estado
 
         self._create_ui()
         self.refresh()
@@ -55,21 +58,51 @@ class ReportsTab:
         main_frame = ttk.Frame(parent, padding=20)
         main_frame.pack(fill=tk.BOTH, expand=True)
 
+        # NEW: Indicador de tiempo real y botón de actualizar
+        header_frame = ttk.Frame(main_frame)
+        header_frame.grid(row=0, column=0, columnspan=3, pady=5, sticky=tk.EW)
+
+        # Indicador visual de tiempo real
+        self._update_indicator = ttk.Label(
+            header_frame,
+            text="● Tiempo Real",
+            font=('Helvetica', 9, 'bold'),
+            foreground='#27ae60'  # Verde
+        )
+        self._update_indicator.pack(side=tk.LEFT, padx=5)
+
+        # NEW: Botón manual de actualizar
+        refresh_btn = ttk.Button(
+            header_frame,
+            text="↻ Actualizar",
+            command=self.refresh
+        )
+        refresh_btn.pack(side=tk.LEFT, padx=10)
+
+        # Label de última actualización
+        self._auto_refresh_label = ttk.Label(
+            header_frame,
+            text="",
+            font=('Helvetica', 8),
+            foreground='#7f8c8d'
+        )
+        self._auto_refresh_label.pack(side=tk.LEFT, padx=10)
+
         # Obtener datos
         dashboard_data = self.reports_service.get_dashboard_data()
         self._dashboard_data = dashboard_data
 
-        # Crear cards
+        # Crear cards (actualizado v1.0.2 con ganancias)
         cards = [
             ("Ventas Hoy", f"{dashboard_data['today_sales_count']}", "T"),
             ("Ingresos Hoy", f"${dashboard_data['today_revenue']:.2f}", "$"),
-            ("Total Ventas", f"{dashboard_data['total_sales']}", "T"),
-            ("Ingresos Totales", f"${dashboard_data['total_revenue']:.2f}", "$"),
+            ("Ganancia Hoy", f"${dashboard_data.get('today_profit', 0):.2f}", "G"),
+            ("Capital Invertido", f"${dashboard_data.get('total_capital_invested', 0):.2f}", "C"),
+            ("Ganancia Total", f"${dashboard_data.get('total_profit', 0):.2f}", "P"),
             ("Productos", f"{dashboard_data['total_products']}", "#"),
-            ("Stock Bajo", f"{dashboard_data['low_stock_count']}", "!"),
         ]
 
-        # Grid de cards
+        # Grid de cards (3 columnas ahora)
         for idx, (title, value, symbol) in enumerate(cards):
             row = idx // 3
             col = idx % 3
@@ -80,7 +113,7 @@ class ReportsTab:
             value_label = ttk.Label(
                 card_frame,
                 text=value,
-                font=('Helvetica', 16, 'bold'),
+                font=('Helvetica', 14, 'bold'),
                 foreground='#2c3e50'
             )
             value_label.pack(pady=20)
@@ -139,14 +172,16 @@ class ReportsTab:
         # Obtener datos
         inventory_report = self.reports_service.get_inventory_report()
 
-        # Resumen
+        # Resumen (actualizado v1.0.2)
         summary_frame = ttk.LabelFrame(main_frame, text="Resumen de Inventario", padding=15)
         summary_frame.pack(fill=tk.X, padx=10, pady=10)
 
         info = [
             f"Total de Productos: {inventory_report['total_products']}",
             f"Items en Stock: {inventory_report['total_items']}",
-            f"Valor Total del Inventario: ${inventory_report['total_value']:.2f}",
+            f"Capital Invertido: ${inventory_report['total_capital']:.2f}",
+            f"Valor del Inventario: ${inventory_report['total_value']:.2f}",
+            f"Ganancia Potencial: ${inventory_report['potential_profit']:.2f}",
             f"Productos en Stock Bajo: {inventory_report['low_stock_count']}"
         ]
 
@@ -337,19 +372,29 @@ class ReportsTab:
         # Forzar actualizacion de UI
         self.frame.update()  # Actualizar la UI inmediatamente
 
+        # NEW: Actualizar indicador de tiempo real
+        self._last_update_time = datetime.now()
+        if self._update_indicator:
+            self._update_indicator.config(text="● Actualizado", foreground='#27ae60')
+        if self._auto_refresh_label:
+            self._auto_refresh_label.config(
+                text=f"Última actualización: {self._last_update_time.strftime('%H:%M:%S')}"
+            )
+
         # Obtener nuevos datos del dashboard
         dashboard_data = self.reports_service.get_dashboard_data()
         self._dashboard_data = dashboard_data
 
-        # Actualizar las etiquetas del dashboard (cards numericos)
-        if hasattr(self, '_dashboard_labels') and hasattr(self, '_dashboard_card_titles'):
+        # Actualizar las etiquetas del dashboard (cards numericos - v1.0.2)
+        # Forzar actualización
+        if hasattr(self, '_dashboard_labels'):
             card_values = [
                 str(dashboard_data['today_sales_count']),
                 f"${dashboard_data['today_revenue']:.2f}",
-                str(dashboard_data['total_sales']),
-                f"${dashboard_data['total_revenue']:.2f}",
+                f"${dashboard_data.get('today_profit', 0):.2f}",
+                f"${dashboard_data.get('total_capital_invested', 0):.2f}",
+                f"${dashboard_data.get('total_profit', 0):.2f}",
                 str(dashboard_data['total_products']),
-                str(dashboard_data['low_stock_count']),
             ]
             for idx, label in enumerate(self._dashboard_labels):
                 label.config(text=card_values[idx])
@@ -368,13 +413,15 @@ class ReportsTab:
                     f"${product['total_revenue']:.2f}"
                 ))
 
-        # Actualizar reporte de inventario si existe
+        # Actualizar reporte de inventario si existe (v1.0.2)
         if hasattr(self, '_inventory_labels') and self._inventory_labels:
             inventory_report = self.reports_service.get_inventory_report()
             inventory_values = [
                 f"Total de Productos: {inventory_report['total_products']}",
                 f"Items en Stock: {inventory_report['total_items']}",
-                f"Valor Total del Inventario: ${inventory_report['total_value']:.2f}",
+                f"Capital Invertido: ${inventory_report['total_capital']:.2f}",
+                f"Valor del Inventario: ${inventory_report['total_value']:.2f}",
+                f"Ganancia Potencial: ${inventory_report['potential_profit']:.2f}",
                 f"Productos en Stock Bajo: {inventory_report['low_stock_count']}"
             ]
             for idx, label in enumerate(self._inventory_labels):
