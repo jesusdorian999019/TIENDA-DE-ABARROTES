@@ -1,6 +1,6 @@
 # FerreteriaPOS - Sistema de Gestión para Ferretería
 
-![Version](https://img.shields.io/badge/version-1.0.1-blue)
+![Version](https://img.shields.io/badge/version-1.0.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![Python](https://img.shields.io/badge/python-3.13-orange)
@@ -299,4 +299,4 @@ Para reporte de errores o consultas, Abre un issue en el repositorio.
 
 ---
 
-*Última actualización: Abril 2026 | Versión: 1.0.1*
+*Última actualización: Abril 2026 | Versión: 1.0.3*

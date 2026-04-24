@@ -9,7 +9,17 @@
       "Bash(python -m py_compile \"d:/codigo 01/TIENDA-DE-ABARROTES/ferreteria_app/ui/main_window.py\")",
       "Bash(python main.py)",
       "Bash(python -m py_compile \"d:/codigo 01/TIENDA-DE-ABARROTES/ferreteria_app/utils/update_checker.py\")",
-      "Bash(pyinstaller --onefile --name FerreteriaPOS --windowed main.py)"
+      "Bash(pyinstaller --onefile --name FerreteriaPOS --windowed main.py)",
+      "Bash(python -c \"import pandas as pd; df = pd.read_excel\\(r''d:\\\\codigo 01\\\\TIENDA-DE-ABARROTES\\\\FORMATO_SUBIDA_PRODUCTOS_V AVANCE.xlsx'', header=None\\); print\\(df.to_string\\(\\)\\)\")",
+      "Bash(cd d:codigo 01TIENDA-DE-ABARROTESferreteria_app)",
+      "Bash(python d:/codigo 01/TIENDA-DE-ABARROTES/ferreteria_app/main.py)",
+      "Bash(pyinstaller FerreteriaPOS.spec --clean)",
+      "Bash(python -m PyInstaller --onefile --name=FerreteriaPOS --console=false --icon=NONE --distpath=\"..\" --workpath=\".build\" --specpath=\".\" main.py)",
+      "Bash(python -m PyInstaller --onefile --name=FerreteriaPOS main.py)",
+      "Bash(python -m PyInstaller FerreteriaPOS.spec --clean)",
+      "Bash(python -m PyInstaller --onefile --name=FerreteriaPOS --exclude-module pandas --exclude-module scipy --exclude-module numpy --exclude-module sqlalchemy main.py)",
+      "Bash(copy \"d:\\\\codigo 01\\\\TIENDA-DE-ABARROTES\\\\ferreteria_app\\\\dist\\\\FerreteriaPOS.exe\" \"d:\\\\codigo 01\\\\TIENDA-DE-ABARROTES\\\\FerreteriaPOS.exe\")",
+      "Bash(pyinstaller FerreteriaPOS.spec --noconfirm)"
     ]
   }
 }

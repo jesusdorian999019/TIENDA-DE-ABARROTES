@@ -19,11 +19,13 @@ class InventoryService:
         self.data_updated_callbacks.append(callback)
     
     def create_product(self, name: str, category: str, code: str, provider: str,
-                      purchase_price: float, sale_price: float, stock: int,
-                      min_stock: int) -> Tuple[bool, str]:
+                      purchase_price: float, sale_price: float, stock: float,
+                      min_stock: float, marca: str = "", unidad: str = "UNIDAD",
+                      flexible_stock: bool = False, equivalente_sunat: str = "",
+                      tipo_igv: str = "") -> Tuple[bool, str]:
         """
-        Crea un nuevo producto.
-        
+        Crea un nuevo producto (actualizado v1.0.2).
+
         Returns:
             Tupla (éxito, mensaje)
         """
@@ -31,52 +33,48 @@ class InventoryService:
         valid, msg = self.validators.validate_product_name(name)
         if not valid:
             return False, msg
-        
+
         valid, msg = self.validators.validate_category(category)
         if not valid:
             return False, msg
-        
+
         valid, msg = self.validators.validate_code(code)
         if not valid:
             return False, msg
-        
+
         valid, msg = self.validators.validate_provider(provider)
         if not valid:
             return False, msg
-        
+
         valid, msg = self.validators.validate_price(str(purchase_price))
         if not valid:
             return False, msg
-        
+
         valid, msg = self.validators.validate_price(str(sale_price))
         if not valid:
             return False, msg
-        
+
         # Validar que el precio de venta sea mayor al precio de compra
         if float(sale_price) <= float(purchase_price):
             return False, "El precio de venta debe ser mayor al precio de compra (requiere ganancia)"
-        
+
         valid, msg = self.validators.validate_quantity(str(stock))
         if not valid:
             return False, msg
-        
+
         valid, msg = self.validators.validate_min_stock(str(min_stock))
         if not valid:
             return False, msg
-        
+
         # Validar que el stock inicial sea mayor o igual al stock mínimo
-        if int(stock) < int(min_stock):
+        if float(stock) < float(min_stock):
             return False, f"Stock inicial ({stock}) no puede ser menor al stock mínimo ({min_stock})"
-        
-        valid, msg = self.validators.validate_min_stock(str(min_stock))
-        if not valid:
-            return False, msg
-        
+
         # Verificar código único
         if self.data_manager.get_product_by_code(code):
             return False, f"El código {code} ya existe"
-        
-        # Crear producto
+
+        # Crear producto con nuevos campos
         product = Product(
             id=str(uuid.uuid4()),
             name=name,
@@ -85,8 +83,14 @@ class InventoryService:
             provider=provider,
             purchase_price=float(purchase_price),
             sale_price=float(sale_price),
-            stock=int(stock),
-            min_stock=int(min_stock)
+            stock=float(stock),  # Ahora float
+            min_stock=float(min_stock),  # Ahora float
+            # Nuevos campos (v1.0.2)
+            marca=marca,
+            unidad=unidad,
+            flexible_stock=flexible_stock,
+            equivalente_sunat=equivalente_sunat,
+            tipo_igv=tipo_igv
         )
         
         if self.data_manager.create_product(product):
@@ -97,35 +101,43 @@ class InventoryService:
     
     def update_product(self, product_id: str, name: str, category: str, code: str,
                       provider: str, purchase_price: float, sale_price: float,
-                      stock: int, min_stock: int) -> Tuple[bool, str]:
-        """Actualiza un producto."""
+                      stock: float, min_stock: float, marca: str = "",
+                      unidad: str = "UNIDAD", flexible_stock: bool = False,
+                      equivalente_sunat: str = "", tipo_igv: str = "") -> Tuple[bool, str]:
+        """Actualiza un producto (actualizado v1.0.2)."""
         # Validar entrada
         valid, msg = self.validators.validate_product_name(name)
         if not valid:
             return False, msg
-        
+
         # Verificar que exista
         product = self.data_manager.get_product(product_id)
         if not product:
             return False, "Producto no encontrado"
-        
+
         # Verificar código único (si cambió)
         if product.code != code:
             if self.data_manager.get_product_by_code(code):
                 return False, f"El código {code} ya existe"
-        
-        # Actualizar
+
+        # Actualizar con nuevos campos
         product.name = name
         product.category = category
         product.code = code
         product.provider = provider
         product.purchase_price = float(purchase_price)
         product.sale_price = float(sale_price)
-        product.stock = int(stock)
-        product.min_stock = int(min_stock)
-        
+        product.stock = float(stock)
+        product.min_stock = float(min_stock)
+        # Nuevos campos
+        product.marca = marca
+        product.unidad = unidad
+        product.flexible_stock = flexible_stock
+        product.equivalente_sunat = equivalente_sunat
+        product.tipo_igv = tipo_igv
+
         if self.data_manager.update_product(product):
-            self._notify_callbacks()  # NEW
+            self._notify_callbacks()
             return True, "Producto actualizado exitosamente"
         else:
             return False, "Error al actualizar producto"
@@ -166,20 +178,25 @@ class InventoryService:
         """Obtiene productos por categoría."""
         return self.data_manager.get_products_by_category(category)
     
-    def update_stock(self, product_id: str, quantity: int) -> Tuple[bool, str]:
-        """Actualiza stock de un producto."""
+    def update_stock(self, product_id: str, quantity: float) -> Tuple[bool, str]:
+        """Actualiza stock de un producto (permite decimales)."""
         if self.data_manager.update_product_stock(product_id, quantity):
-            self._notify_callbacks()  # NEW
+            self._notify_callbacks()
             return True, "Stock actualizado"
         else:
             return False, "Error al actualizar stock"
     
     def get_inventory_value(self) -> float:
-        """Calcula el valor total del inventario."""
+        """Calcula el valor total del inventario (precio de venta)."""
         products = self.data_manager.get_all_products()
         return sum(p.sale_price * p.stock for p in products)
-    
-    def get_total_items(self) -> int:
+
+    def get_inventory_cost_value(self) -> float:
+        """Calcula el capital invertido (precio de compra total)."""
+        products = self.data_manager.get_all_products()
+        return sum(p.purchase_price * p.stock for p in products)
+
+    def get_total_items(self) -> float:
         """Obtiene total de items en stock."""
         products = self.data_manager.get_all_products()
         return sum(p.stock for p in products)

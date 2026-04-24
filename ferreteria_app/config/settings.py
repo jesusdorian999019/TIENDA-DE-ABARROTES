@@ -21,7 +21,7 @@ SALES_FILE = DATA_DIR / "sales.json"
 
 # Configuración de la aplicación
 APP_TITLE = "Gestión de Ferretería"
-APP_VERSION = "1.0.1"
+APP_VERSION = "1.0.3"  # Actualizado con tiempo real en reportes
 
 # GitHub update settings - CONFIGURAR ESTO PARA ACTUALIZACIONES
 GITHUB_OWNER = "jesusdorian999019"  # Usuario de GitHub
@@ -60,4 +60,23 @@ PRODUCT_CATEGORIES = [
     "Jardinería",
     "Automotriz",
     "Otros"
+]
+
+# Unidades de medida (v1.0.2)
+PRODUCT_UNITS = [
+    "UNIDAD",
+    "KILO",
+    "METRO",
+    "LITRO",
+    "GALON",
+    "BOLSA",
+    "CAJA",
+    "PAR"
+]
+
+# Tipos de IGV ( Perú )
+IGV_TYPES = [
+    "Gravado",
+    "Exonerado",
+    "Inafecto"
 ]

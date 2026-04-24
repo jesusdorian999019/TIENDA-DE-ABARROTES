@@ -36,22 +36,34 @@ class SalesTab:
         
         # Cantidad
         ttk.Label(register_frame, text="Cantidad:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
-        self.quantity_var = tk.StringVar()
-        ttk.Spinbox(register_frame, from_=1, to=1000, textvariable=self.quantity_var, width=43).grid(row=1, column=1, padx=5, pady=5)
+        self.quantity_var = tk.StringVar(value="1")
+        # Ahora permite decimales
+        quantity_spin = ttk.Spinbox(register_frame, from_=0.1, to=10000, increment=0.1,
+                                   textvariable=self.quantity_var, width=43)
+        quantity_spin.grid(row=1, column=1, padx=5, pady=5)
+
+        # Tipo de venta (Unidad/Kilo)
+        ttk.Label(register_frame, text="Tipo:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
+        self.type_var = tk.StringVar(value="UNIDAD")
+        type_combo = ttk.Combobox(register_frame, textvariable=self.type_var,
+                                values=["UNIDAD", "KILO", "METRO", "LITRO"],
+                                width=41)
+        type_combo.grid(row=2, column=1, padx=5, pady=5)
+        type_combo.bind('<<ComboboxSelected>>', self._on_type_selected)
         
         # Precio unitario (mostrado automáticamente)
-        ttk.Label(register_frame, text="Precio Unitario:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
+        ttk.Label(register_frame, text="Precio Unitario:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=5)
         self.price_label = ttk.Label(register_frame, text="$0.00", font=('Helvetica', 10, 'bold'))
-        self.price_label.grid(row=2, column=1, sticky=tk.W, padx=5, pady=5)
-        
+        self.price_label.grid(row=3, column=1, sticky=tk.W, padx=5, pady=5)
+
         # Total (calculado automáticamente)
-        ttk.Label(register_frame, text="Total:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=5)
+        ttk.Label(register_frame, text="Total:").grid(row=4, column=0, sticky=tk.W, padx=5, pady=5)
         self.total_label = ttk.Label(register_frame, text="$0.00", font=('Helvetica', 10, 'bold'), foreground='green')
-        self.total_label.grid(row=3, column=1, sticky=tk.W, padx=5, pady=5)
-        
+        self.total_label.grid(row=4, column=1, sticky=tk.W, padx=5, pady=5)
+
         # Botones
         button_frame = ttk.Frame(register_frame)
-        button_frame.grid(row=4, column=0, columnspan=2, pady=10, sticky=tk.E)
+        button_frame.grid(row=5, column=0, columnspan=2, pady=10, sticky=tk.E)
         
         ttk.Button(button_frame, text="✓ Confirmar Venta", command=self._register_sale).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="↻ Limpiar", command=self._clear_form).pack(side=tk.LEFT, padx=5)
@@ -131,11 +143,32 @@ class SalesTab:
             # Extraer código del producto seleccionado
             code = selection.split('(')[-1].rstrip(')')
             product = self.inventory_service.data_manager.get_product_by_code(code)
-            
+
             if product:
                 self.price_label.config(text=f"${product.sale_price:.2f}")
                 self.current_product = product
+                # Actualizar tipo según la unidad del producto
+                self.type_var.set(product.unidad)
                 self._calculate_total()
+
+    def _on_type_selected(self, event=None):
+        """Evento cuando se cambia el tipo de venta."""
+        self._calculate_total()
+
+    def _calculate_total(self, *args):
+        """Calcula el total automáticamente."""
+        try:
+            quantity = float(self.quantity_var.get() or 0)
+            price_text = self.price_label.cget('text').replace('$', '')
+            price = float(price_text or 0)
+
+            # Ajustar precio si es por kilo (mostrar precio por kilo)
+            venta_tipo = self.type_var.get()
+
+            total = quantity * price
+            self.total_label.config(text=f"${total:.2f}")
+        except:
+            pass
     
     def _calculate_total(self, *args):
         """Calcula el total automáticamente."""
@@ -152,38 +185,42 @@ class SalesTab:
         """Registra una venta."""
         product_selection = self.product_var.get()
         quantity_str = self.quantity_var.get()
-        
+
         if not product_selection:
             messagebox.showwarning("Advertencia", "Seleccione un producto")
             return
-        
-        if not quantity_str or int(quantity_str) <= 0:
+
+        if not quantity_str or float(quantity_str) <= 0:
             messagebox.showwarning("Advertencia", "Ingrese una cantidad válida")
             return
-        
+
         try:
             # Obtener el producto
             code = product_selection.split('(')[-1].rstrip(')')
             product = self.inventory_service.data_manager.get_product_by_code(code)
-            
+
             if not product:
                 messagebox.showerror("Error", "Producto no encontrado")
                 return
-            
-            quantity = int(quantity_str)
-            
-            if quantity > product.stock:
+
+            quantity = float(quantity_str)
+
+            if quantity > float(product.stock):
                 messagebox.showerror("Error", f"Stock insuficiente. Disponible: {product.stock}")
                 return
-            
-            # Registrar venta
+
+            # Obtener tipo de venta
+            venta_tipo = self.type_var.get()
+
+            # Registrar venta (ahora acepta float y pasa la unidad)
             success, message = self.sales_service.register_sale(
                 product_id=product.id,
                 product_name=product.name,
                 quantity=quantity,
-                unit_price=product.sale_price
+                unit_price=product.sale_price,
+                unidad=venta_tipo
             )
-            
+
             if success:
                 messagebox.showinfo("Éxito", message)
                 self._clear_form()
@@ -191,7 +228,7 @@ class SalesTab:
                 self._update_product_list()
             else:
                 messagebox.showerror("Error", message)
-        
+
         except ValueError:
             messagebox.showerror("Error", "Cantidad debe ser un número")
     
@@ -199,6 +236,7 @@ class SalesTab:
         """Limpia el formulario."""
         self.product_var.set('')
         self.quantity_var.set('1')
+        self.type_var.set('UNIDAD')
         self.price_label.config(text='$0.00')
         self.total_label.config(text='$0.00')
     

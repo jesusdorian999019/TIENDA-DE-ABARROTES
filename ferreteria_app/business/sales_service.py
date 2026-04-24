@@ -20,11 +20,11 @@ class SalesService:
         """Register callback for data updates."""
         self.data_updated_callbacks.append(callback)
     
-    def register_sale(self, product_id: str, product_name: str, quantity: int,
-                     unit_price: float) -> Tuple[bool, str]:
+    def register_sale(self, product_id: str, product_name: str, quantity: float,
+                     unit_price: float, unidad: str = "UNIDAD") -> Tuple[bool, str]:
         """
         Registra una venta con validación de stock.
-        
+
         Returns:
             Tupla (éxito, mensaje)
         """
@@ -32,40 +32,49 @@ class SalesService:
         valid, msg = self.validators.validate_quantity(str(quantity))
         if not valid:
             return False, msg
-        
+
         valid, msg = self.validators.validate_price(str(unit_price))
         if not valid:
             return False, msg
-        
+
         # Validar que existe el servicio de inventario
         if not self.inventory_service:
             return False, "Servicio de inventario no disponible"
-        
+
         # Validar que el producto existe
         product = self.inventory_service.get_product(product_id)
         if not product:
             return False, "Producto no encontrado"
-        
-        # Validar que hay suficiente stock
-        if product.stock < quantity:
-            return False, f"Stock insuficiente. Disponible: {product.stock}, Solicitado: {quantity}"
-        
+
+        # Validar que hay suficiente stock (soporta decimales si flexible_stock=True)
+        # Convertir a float para comparación
+        available_stock = float(product.stock)
+        requested_quantity = float(quantity)
+
+        if available_stock < requested_quantity:
+            return False, f"Stock insuficiente. Disponible: {available_stock}, Solicitado: {requested_quantity}"
+
         # Calcular total
-        total = quantity * unit_price
-        
+        total = requested_quantity * unit_price
+
         # Obtener fecha y hora
         now = datetime.now()
         date_str = now.strftime('%Y-%m-%d')
         time_str = now.strftime('%H:%M:%S')
-        
+
+        # Obtener precio de compra para calcular ganancias
+        purchase_price = product.purchase_price
+
         # Crear venta
         sale = Sale(
             id=str(uuid.uuid4()),
             product_id=product_id,
             product_name=product_name,
-            quantity=int(quantity),
+            quantity=requested_quantity,
             unit_price=float(unit_price),
             total=float(total),
+            purchase_price=float(purchase_price),  # Guardar precio de compra
+            unidad=unidad,
             date=date_str,
             time=time_str
         )

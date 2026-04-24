@@ -37,25 +37,25 @@ class Validators:
     
     @staticmethod
     def validate_quantity(quantity: str) -> Tuple[bool, str]:
-        """Valida una cantidad."""
+        """Valida una cantidad - ahora permite decimales para ventas por kilo."""
         try:
-            q = int(quantity)
+            q = float(quantity)  # Cambiado a float para permitir decimales
             if q < 0:
                 return False, "La cantidad no puede ser negativa"
             return True, ""
         except:
-            return False, "La cantidad debe ser un número entero válido"
-    
+            return False, "La cantidad debe ser un número válido"
+
     @staticmethod
     def validate_min_stock(min_stock: str) -> Tuple[bool, str]:
-        """Valida stock mínimo."""
+        """Valida stock mínimo - ahora permite decimales."""
         try:
-            q = int(min_stock)
+            q = float(min_stock)  # Cambiado a float para permitir decimales
             if q < 0:
                 return False, "El stock mínimo no puede ser negativo"
             return True, ""
         except:
-            return False, "El stock mínimo debe ser un número entero válido"
+            return False, "El stock mínimo debe ser un número válido"
     
     @staticmethod
     def validate_category(category: str) -> Tuple[bool, str]:
